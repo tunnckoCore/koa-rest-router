@@ -1,6 +1,6 @@
 {
   "name": "koa-rest-router",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Building powerful, flexible and RESTful APIs for enterprise easily.",
   "repository": "tunnckoCore/koa-rest-router",
   "author": "Charlike Mike Reagent <@tunnckoCore> (http://www.tunnckocore.tk)",
