@@ -10,7 +10,15 @@
 'use strict'
 
 // var Koa = require('koa')
-// var test = require('mukla')
-// var Router = require('./index').Router
-// var Resource = require('./index').RestRouter
-// var request = require('supertest')
+// var app = new Koa()
+// var router = require('./index')()
+
+// // load all methods
+// router.load()
+// router.get()
+// router.post()
+// router.put()
+// router.resource()
+// router.extend()
+
+// app.use(router.middleware())

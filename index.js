@@ -7,99 +7,101 @@
 
 'use strict'
 
-// let inflect = require('inflection')
-// let extend = require('extend-shallow')
-// let Router = require('koa-router')
-// // let util = require('util')
+let util = require('util')
+let utils = require('./utils')
 
-// let defaultController = {
-//   index: notImplemented(),
-//   new: notImplemented(),
-//   create: notImplemented(),
-//   edit: notImplemented(),
-//   update: notImplemented(),
-//   destroy: notImplemented(),
-//   remove: notImplemented(),
-//   delete: notImplemented(),
-//   del: notImplemented()
-// }
+function KoaRestRouter (options) {
+  if (!(this instanceof KoaRestRouter)) {
+    return new KoaRestRouter(options)
+  }
+  utils.Router.call(this, options)
+}
 
-// function RestRouter (name, controller, options) {
-//   if (!(this instanceof RestRouter)) {
-//     return new RestRouter(name, controller, options)
-//   }
-//   if (typeof name === 'object') {
-//     controller = name
-//     name = '/'
-//   }
-//   if (typeof name !== 'string') {
-//     name = '/'
-//   }
-//   this._name = name !== '/'
-//     ? inflect.pluralize(name)
-//     : ''
-//   this._param = name !== '/'
-//     ? ':' + inflect.singularize(name)
-//     : ':id'
-//   this._ctrl = extend(defaultController, controller)
-//   this._options = extend({}, options)
-//   this.router = new Router()
-// }
+util.inherits(KoaRestRouter, utils.Router)
 
-// // util.inherits(RestRouter, Router)
+KoaRestRouter.prototype.extend = function extend (dest, src1, src2) {
+  let res = []
+  let len = dest.length
+  let i = 0
 
-// RestRouter.prototype.rest = function rest () {
-//   let self = this
-//   this.router
-//     .get(r(this._name), this._ctrl.index)
-//     .get(r(this._name, 'new'), this._ctrl.new)
-//     .post(r(this._name), this._ctrl.create)
-//     // Fix `/users/new` to call `controller.new` method
-//     // it conflicts because `/users/:user` handles it
-//     .get(r(this._name, this._param), function (ctx, next) {
-//       if (ctx.params[self._param.slice(1)] === 'new') {
-//         self._ctrl.new.apply(self._ctrl, arguments)
-//         return
-//       }
-//       self._ctrl.show.apply(self._ctrl, arguments)
-//     })
-//     .get(r(this._name, this._param, 'edit'), this._ctrl.edit)
+  while (i < len) {
+    let idx = i++
+    let destRoute = dest[idx]
+    let srcRoute = src1[idx]
+    let pathname = utils.createPath(destRoute, srcRoute)
+    let route = {
+      path: pathname,
+      match: this.route(pathname),
+      middlewares: srcRoute.middlewares,
+      method: srcRoute.method
+    }
 
-//     // autohandle updates
-//     // PUT     /users/:user       ->  update
-//     // POST    /users/:user       ->  update
-//     // PATCH   /users/:user       ->  update
-//     .put(r(this._name, this._param), this._ctrl.update)
-//     .post(r(this._name, this._param), this._ctrl.update)
-//     .patch(r(this._name, this._param), this._ctrl.update)
+    if (src2) {
+      let extraRoute = src2[idx]
+      pathname = utils.createPath(route, extraRoute, true)
+      route = {
+        path: pathname,
+        match: this.route(pathname),
+        middlewares: extraRoute.middlewares,
+        method: extraRoute.method
+      }
+    }
 
-//     // autohandle deletes
-//     // DELETE   /users/:user       ->  destroy
-//     // DELETE   /users/:user       ->  remove
-//     // DELETE   /users/:user       ->  delete
-//     // DELETE   /users/:user       ->  del
-//     .del(r(this._name, this._param), this._ctrl.destroy)
-//     .del(r(this._name, this._param), this._ctrl.remove)
-//     .del(r(this._name, this._param), this._ctrl.delete)
-//     .del(r(this._name, this._param), this._ctrl.del)
-//   return this.router.routes()
-// }
+    res.push(route)
+    this._routes.push(route)
+  }
+  return res
+}
 
-// function notImplemented () {
-//   return function (ctx, next) {
-//     // ctx.throw(501)
-//     ctx.status = 501
-//     ctx.body = 'Not Implemented'
-//     return next()
-//   }
-// }
+KoaRestRouter.prototype.resource = function resource (name, ctrl, opts) {
+  if (typeof name === 'object') {
+    opts = ctrl
+    ctrl = name
+    name = '/'
+  }
+  if (typeof name !== 'string') {
+    name = '/'
+  }
+  let pathname = name !== '/'
+    ? utils.inflection.pluralize(name)
+    : ''
+  let param = name !== '/'
+    ? ':' + utils.inflection.singularize(name)
+    : ':id'
 
-// function r (name, id, edit) {
-//   name = name !== '' ? `/${name}` : ''
-//   let url = name + (id ? `/${id}` : '') + (edit ? `/${edit}` : '')
-//   console.log(url)
-//   return url
-// }
+  let oldRoutes = utils.cloneArray(this._routes)
+  this._routes = []
+  this.options = utils.extend({}, this.options, opts)
 
-// module.exports.RestRouter = RestRouter
-// module.exports.Router = Router
+  ctrl = utils.extend({}, utils.defaultController, ctrl)
+
+  // @todo use `.addRoute`
+  this
+    .get(utils.r(pathname), ctrl.index)
+    .get(utils.r(pathname, 'new'), ctrl.new)
+    .post(utils.r(pathname), ctrl.create)
+    .get(utils.r(pathname, param), ctrl.show)
+    .get(utils.r(pathname, param, 'edit'), ctrl.edit)
+
+    // auto-handle updates
+    // PUT     /users/:user       ->  update
+    // POST    /users/:user       ->  update
+    // PATCH   /users/:user       ->  update
+    .put(utils.r(pathname, param), ctrl.update)
+    .post(utils.r(pathname, param), ctrl.update)
+    .patch(utils.r(pathname, param), ctrl.update)
+
+    // auto-handle deletes
+    // DELETE   /users/:user       ->  destroy
+    // DELETE   /users/:user       ->  remove
+    // DELETE   /users/:user       ->  delete
+    // DELETE   /users/:user       ->  del
+    .del(utils.r(pathname, param), ctrl.destroy)
+    .del(utils.r(pathname, param), ctrl.remove)
+    .del(utils.r(pathname, param), ctrl.delete)
+    .del(utils.r(pathname, param), ctrl.del)
+
+  let srcRoutes = utils.cloneArray(this._routes)
+  this._routes = oldRoutes.concat(srcRoutes)
+  return srcRoutes
+}
