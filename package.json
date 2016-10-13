@@ -1,7 +1,7 @@
 {
   "name": "koa-rest-router",
-  "version": "0.1.0",
-  "description": " - nothing more.",
+  "version": "0.2.0",
+  "description": "Building powerful, flexible and RESTful APIs for enterprise easily.",
   "repository": "tunnckoCore/koa-rest-router",
   "author": "Charlike Mike Reagent <@tunnckoCore> (http://www.tunnckocore.tk)",
   "precommit.silent": true,
@@ -23,7 +23,7 @@
   "dependencies": {
     "extend-shallow": "^2.0.1",
     "inflection": "^1.10.0",
-    "koa-router": "^7.0.1"
+    "koa-better-router": "*"
   },
   "devDependencies": {
     "commitizen": "^2.8.6",
