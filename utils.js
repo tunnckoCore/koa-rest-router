@@ -13,6 +13,12 @@ require('inflection')
 require('koa-better-router', 'Router')
 require = fn // eslint-disable-line no-undef, no-native-reassign, no-global-assign
 
+utils.r = function r (name, id, edit) {
+  name = name !== '' ? `/${name}` : ''
+  let url = name + (id ? `/${id}` : '') + (edit ? `/${edit}` : '')
+  return url
+}
+
 utils.cloneArray = function cloneArray (arr) {
   let res = []
   for (const item of arr) {
@@ -45,6 +51,51 @@ utils.createPath = function createPath (destRoute, srcRoute, third) {
 
   let path = destParts.concat(srcParts).filter(Boolean)
   return '/' + path.join('/')
+}
+
+utils.notImplemented = function notImplemented () {
+  return function (ctx, next) {
+    ctx.status = 501
+    ctx.body = 'Not Implemented'
+    return next()
+  }
+}
+
+utils.defaultController = {
+  new: utils.notImplemented(),
+  show: utils.notImplemented(),
+  edit: utils.notImplemented(),
+  index: utils.notImplemented(),
+  create: utils.notImplemented(),
+  update: utils.notImplemented(),
+  remove: utils.notImplemented()
+}
+
+utils.defaultControllerMap = {
+  new: 'new',
+  show: 'show',
+  edit: 'edit',
+  index: 'index',
+  create: 'create',
+  update: 'update',
+  remove: 'remove'
+}
+
+utils.defaultRequestMethods = {
+  get: 'GET',
+  post: 'POST',
+  put: 'PUT',
+  delete: 'DELETE'
+}
+
+utils.mergeOptions = function merge (opts, options) {
+  options = utils.extend({}, options)
+  let map = utils.extend(opts.map, options.map)
+  let methods = utils.extend(opts.methods, options.methods)
+  opts = utils.extend(opts, options)
+  opts.map = map
+  opts.methods = methods
+  return opts
 }
 
 /**

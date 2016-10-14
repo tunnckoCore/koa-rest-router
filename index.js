@@ -14,11 +14,16 @@ function KoaRestRouter (options) {
   if (!(this instanceof KoaRestRouter)) {
     return new KoaRestRouter(options)
   }
-  utils.Router.call(this, options)
+  utils.Router.call(this, utils.mergeOptions({
+    methods: utils.defaultRequestMethods,
+    map: utils.defaultControllerMap
+  }, options))
 }
 
 util.inherits(KoaRestRouter, utils.Router)
 
+// searching for better name... Which should not be too long
+// and be meaningful and user-fiendly, easy to guest what it does
 KoaRestRouter.prototype.extend = function extend (dest, src1, src2) {
   let res = []
   let len = dest.length
@@ -48,7 +53,7 @@ KoaRestRouter.prototype.extend = function extend (dest, src1, src2) {
     }
 
     res.push(route)
-    this._routes.push(route)
+    this.routes.push(route)
   }
   return res
 }
@@ -69,39 +74,44 @@ KoaRestRouter.prototype.resource = function resource (name, ctrl, opts) {
     ? ':' + utils.inflection.singularize(name)
     : ':id'
 
-  let oldRoutes = utils.cloneArray(this._routes)
-  this._routes = []
-  this.options = utils.extend({}, this.options, opts)
+  let oldRoutes = utils.cloneArray(this.routes)
+  this.options = utils.mergeOptions(this.options, opts)
 
   ctrl = utils.extend({}, utils.defaultController, ctrl)
 
-  // @todo use `.addRoute`
+  // map request methods to be used
+  let _get = this.options.methods.get
+  let _put = this.options.methods.put
+  let _del = this.options.methods.del || this.options.methods.delete
+  let _post = this.options.methods.post
+
+  // map controller methods to be called
+  let _index = this.options.map.index
+  let _new = this.options.map.new
+  let _create = this.options.map.create
+  let _show = this.options.map.show
+  let _edit = this.options.map.edit
+  let _update = this.options.map.update
+  let _remove = this.options.map.remove
+
+  // add RESTful routes
   this
-    .get(utils.r(pathname), ctrl.index)
-    .get(utils.r(pathname, 'new'), ctrl.new)
-    .post(utils.r(pathname), ctrl.create)
-    .get(utils.r(pathname, param), ctrl.show)
-    .get(utils.r(pathname, param, 'edit'), ctrl.edit)
+    .addRoute(_get, utils.r(pathname), ctrl[_index])
+    .addRoute(_get, utils.r(pathname, 'new'), ctrl[_new])
+    .addRoute(_post, utils.r(pathname), ctrl[_create])
+    .addRoute(_get, utils.r(pathname, param), ctrl[_show])
+    .addRoute(_get, utils.r(pathname, param, 'edit'), ctrl[_edit])
+    .addRoute(_put, utils.r(pathname, param), ctrl[_update])
+    .addRoute(_del, utils.r(pathname, param), ctrl[_remove])
 
-    // auto-handle updates
-    // PUT     /users/:user       ->  update
-    // POST    /users/:user       ->  update
-    // PATCH   /users/:user       ->  update
-    .put(utils.r(pathname, param), ctrl.update)
-    .post(utils.r(pathname, param), ctrl.update)
-    .patch(utils.r(pathname, param), ctrl.update)
+  let srcRoutes = utils.cloneArray(this.routes)
 
-    // auto-handle deletes
-    // DELETE   /users/:user       ->  destroy
-    // DELETE   /users/:user       ->  remove
-    // DELETE   /users/:user       ->  delete
-    // DELETE   /users/:user       ->  del
-    .del(utils.r(pathname, param), ctrl.destroy)
-    .del(utils.r(pathname, param), ctrl.remove)
-    .del(utils.r(pathname, param), ctrl.delete)
-    .del(utils.r(pathname, param), ctrl.del)
+  // restore routes
+  this.routes = oldRoutes.concat(srcRoutes)
 
-  let srcRoutes = utils.cloneArray(this._routes)
-  this._routes = oldRoutes.concat(srcRoutes)
+  // return only routes that are just created
+  // for this resource
   return srcRoutes
 }
+
+module.exports = KoaRestRouter

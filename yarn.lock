@@ -769,8 +769,8 @@ detect-indent@4.0.0:
     repeating "^2.0.0"
 
 doctrine@^1.2.2:
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/doctrine/-/doctrine-1.4.0.tgz#e2db32defa752407b935b381e89f3740e469e599"
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/doctrine/-/doctrine-1.5.0.tgz#379dce730f6166f76cefa4e6707a159b02c5a6fa"
   dependencies:
     esutils "^2.0.2"
     isarray "^1.0.0"
@@ -1776,12 +1776,11 @@ kind-of@^3.0.2:
   dependencies:
     is-buffer "^1.0.2"
 
-koa-better-router@*:
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/koa-better-router/-/koa-better-router-0.3.0.tgz#1182f1722069b18668cda9b81f819fed7cf06260"
+koa-better-router@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/koa-better-router/-/koa-better-router-1.0.1.tgz#c6e319d60c95a9e61d4462e395ad21ba4f327973"
   dependencies:
     extend-shallow "^2.0.1"
-    inflection "^1.10.0"
     is-es6-generator-function "^1.0.0"
     koa-convert "^1.2.0"
     lazy-cache "^2.0.1"
