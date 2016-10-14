@@ -23,7 +23,7 @@
   "dependencies": {
     "extend-shallow": "^2.0.1",
     "inflection": "^1.10.0",
-    "koa-better-router": "*",
+    "koa-better-router": "1.0.1",
     "lazy-cache": "^2.0.1"
   },
   "devDependencies": {
