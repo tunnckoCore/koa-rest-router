@@ -160,6 +160,14 @@ KoaRestRouter.prototype.getRoutes = function getRoutes () {
   return this.routes
 }
 
+/**
+ * > Just an alias for `.addRoutes`.
+ *
+ * @param {Array} `...args` any number of arguments (arrays of route objects)
+ * @return {KoaRestRouter} `this` instance for chaining
+ * @api public
+ */
+
 KoaRestRouter.prototype.addResources = function addResources () {
   return this.addRoutes.apply(this, arguments)
 }
@@ -392,6 +400,102 @@ KoaRestRouter.prototype.resource = function resource_ (name, ctrl, opts) {
   return this.addResource(resource)
 }
 
+/**
+ * > Core method behind `.resource` for creating single
+ * resource with a `name`, but without adding it to `this.routes` array.
+ * You can override any defaults - default request methods and
+ * default controller methods, just by passing
+ * respectively `opts.methods` object and `opts.map` object.
+ *
+ * **Example**
+ *
+ * ```js
+ * let router = require('koa-rest-router')().loadMethods()
+ *
+ * // The server part
+ * let body = require('koa-better-body')
+ * let Koa = require('koa')
+ * let app = new Koa()
+ *
+ * // override request methods
+ * let methods = {
+ *   put: 'POST'
+ *   del: 'POST'
+ * }
+ *
+ * // override controller methods
+ * let map = {
+ *   index: 'list',
+ *   show: 'read',
+ *   remove: 'destroy'
+ * }
+ *
+ * // create actual resource
+ * let cats = router.createResource('cats', {
+ *   list: [
+ *     (ctx, next) => {
+ *       ctx.body = `This is GET ${ctx.route.path} route with multiple middlewares`
+ *       return next()
+ *     },
+ *     function * (next) {
+ *       this.body = `${this.body} and combining old and modern middlewares.`
+ *       yield next
+ *     }
+ *   ],
+ *   read: (ctx, next) => {
+ *     ctx.body = `This is ${ctx.route.path} route.`
+ *     ctx.body = `${ctx.body} And param ":cat" is ${ctx.params.cat}.`
+ *     ctx.body = `${ctx.body} By default this method is called "show".`
+ *     return next()
+ *   },
+ *   update: [body, (ctx, next) => {
+ *     ctx.body = `This method by default is triggered with PUT requests only.`
+ *     ctx.body = `${ctx.body} But now it is from POST request.`
+ *     return next()
+ *   }, function * (next) => {
+ *     this.body = `${this.body} Incoming data is`
+ *     this.body = `${this.body} ${JSON.stringify(this.request.fields, null, 2)}`
+ *     yield next
+ *   }],
+ *   destroy: (ctx, next) => {
+ *     ctx.body = `This route should be called with DELETE request, by default.`
+ *     ctx.body = `${ctx.body} But now it request is POST.`
+ *     return next()
+ *   }
+ * }, {map: map, methods: methods})
+ *
+ * console.log(cats)
+ * // => array of "Route Objects"
+ *
+ * // router.routes array is empty
+ * console.log(router.getRoutes()) // => []
+ *
+ * // register the resource
+ * router.addResource(cats)
+ *
+ * console.log(router.routes.length) // => 7
+ * console.log(router.getRoutes().length) // => 7
+ * console.log(router.getRoutes()) // or router.routes
+ * // => array of "Route Objects"
+ *
+ * app.use(router.middleware({ prefix: '/api' }))
+ * app.listen(5000, () => {
+ *   console.log(`Server listening on http://localhost:5000`)
+ *   console.log(`Try to open these routes:`)
+ *
+ *   router.routes.forEach((route) => {
+ *     console.log(`${route.method}` http://localhost:5000${route.path}`)
+ *   }))
+ * })
+ * ```
+ *
+ * @param  {String|Object} `name` name of the resource or `ctrl`
+ * @param  {Object} `ctrl` controller object to be called on each endpoint, or `opts`
+ * @param  {Object} `opts` optional, merged with options from constructor
+ * @return {KoaRestRouter} `this` instance for chaining
+ * @api public
+ */
+
 KoaRestRouter.prototype.createResource = function createResource (name, ctrl, opts) {
   if (typeof name === 'object') {
     opts = ctrl
@@ -446,6 +550,70 @@ KoaRestRouter.prototype.createResource = function createResource (name, ctrl, op
   return src
 }
 
+/**
+ * > Powerful method for grouping couple of resources into
+ * one resource endpoint. For example you have `/cats` and `/dogs`
+ * endpoints, but you wanna create `/cats/:cat/dogs/:dog` endpoint,
+ * so you can do such things with that. You can group infinite
+ * number of resources. Useful methods that gives you what you
+ * should pass as arguments here are `.createResource`, `.createRoute`,
+ * `.getResources`, `.getResource` and `.getRoutes`.
+ * **Note:** Be aware of that it replaces middlewares of `dest`
+ * with the middlewares of last `src`.
+ *
+ * **Example**
+ *
+ * ```js
+ * let router = require('koa-rest-router')().loadMethods()
+ *
+ * let departments = router.createResource('departments')
+ * let companies = router.createResource('companies')
+ * let profiles = router.createResource('profiles')
+ * let clients = router.createResource('clients')
+ * let users = router.createResource('users')
+ * let cats = router.createResource('cats')
+ * let dogs = router.createResource('dogs')
+ *
+ * // endpoint: /companies/:company/departments/:department
+ * let one = router.group(companies, departments)
+ *
+ * // endpoint: /profiles/:profile/clients/:client/cats/:cat
+ * let two = router.group(profiles, clients, cats)
+ *
+ * // crazy? huh, AWESOME!
+ * // endpoint: /companies/:company/departments/:department/profiles/:profile/clients/:client/cats/:cat
+ * let foo = router.group(one, two)
+ *
+ * // but actually just "register" `one` and `foo`
+ * // so you WON'T have `/profiles/:profile/clients/:client/cats/:cat`
+ * // endpoint in your API
+ * router.addRoutes(one, foo)
+ *
+ * // Server part
+ * let Koa = require('koa')
+ * let app = new Koa()
+ *
+ * app.use(router.middleware({ prefix: '/api/v3' }))
+ * app.listen(4000, () => {
+ *   console.log(`Mega API server on http://localhost:4000`)
+ *   console.log(`Checkout these routes:`)
+ *
+ *   // it will output 14 links
+ *   router.getRoutes().forEach((route) => {
+ *     console.log(`${route.method} http://localhost:4000${route.path}`)
+ *   })
+ * })
+ * ```
+ *
+ * @param  {Array} `dest` array of _"Route Objects"_ or _"Resource Object"_ (both are arrays)
+ * @param  {Array} `src1` array of _"Route Objects"_ or _"Resource Object"_ (both are arrays)
+ * @param  {Array} `src2` array of _"Route Objects"_ or _"Resource Object"_ (both are arrays)
+ * @param  {Array} `src3` array of _"Route Objects"_ or _"Resource Object"_ (both are arrays)
+ * @param  {Array} `src4` array of _"Route Objects"_ or _"Resource Object"_ (both are arrays)
+ * @return {Array} new array with grouped resources
+ * @api public
+ */
+
 KoaRestRouter.prototype.group = function group (dest, src1, src2, src3, src4) {
   return dest.map((destRoute, index) => {
     let route = utils.createRouteObject(this, destRoute, src1, index)
@@ -455,5 +623,12 @@ KoaRestRouter.prototype.group = function group (dest, src1, src2, src3, src4) {
     return route
   })
 }
+
+/**
+ * Expose `KoaRestRouter` constructor
+ *
+ * @type {Function}
+ * @api private
+ */
 
 module.exports = KoaRestRouter
