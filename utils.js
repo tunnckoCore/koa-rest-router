@@ -11,6 +11,7 @@ require = utils // eslint-disable-line no-undef, no-native-reassign, no-global-a
 require('extend-shallow', 'extend')
 require('inflection')
 require('koa-better-router', 'Router')
+require('methods')
 require = fn // eslint-disable-line no-undef, no-native-reassign, no-global-assign
 
 utils.r = function r (name, id, edit) {
@@ -27,30 +28,32 @@ utils.cloneArray = function cloneArray (arr) {
   return res
 }
 
-utils.createPath = function createPath (destRoute, srcRoute, third) {
-  let destParts = destRoute.path.split('/')
-  let srcParts = srcRoute.path.split('/')
-  let singular = third
-    ? utils.inflection.singularize(destParts[3])
-    : utils.inflection.singularize(destParts[1])
-  let len = third ? 4 : 2
-  let part3 = third ? destParts[5] : destParts[3]
+utils.createPath = function createPath (ctx, destRoute) {
+  let route = destRoute.route.slice(1)
+  if (!route.length) return '/:id'
+  route = route.replace(ctx.options.prefix, '')
 
-  if (destParts.length === len) {
-    destParts.push(`:${singular}`)
-  }
-  if (destParts[2] === 'new') {
-    destParts[2] = `:${singular}`
-  }
-  if (third && destParts[4] === 'new') {
-    destParts[4] = `:${singular}`
-  }
-  if (part3 === 'edit') {
-    destParts = destParts.slice(0, -1)
-  }
+  let res = []
+  let singular = null
+  let parts = route.split('/')
 
-  let path = destParts.concat(srcParts).filter(Boolean)
-  return '/' + path.join('/')
+  var len = parts.length
+  var i = -1
+
+  while (i++ < len) {
+    if (!(i % 2) && parts[i] && parts[i] !== 'edit') {
+      let plur = parts[i]
+      singular = utils.inflection.singularize(plur)
+      res.push(plur)
+      res.push(`:${singular}`)
+    }
+  }
+  return `/${res.join('/')}`
+}
+
+utils.createRouteObject = function createRouteObject (ctx, dest, src, idx) {
+  let pathname = utils.createPath(ctx, dest) + src[idx].route
+  return ctx.createRoute(dest.method, pathname, src[idx].middlewares)
 }
 
 utils.notImplemented = function notImplemented () {
@@ -81,12 +84,10 @@ utils.defaultControllerMap = {
   remove: 'remove'
 }
 
-utils.defaultRequestMethods = {
-  get: 'GET',
-  post: 'POST',
-  put: 'PUT',
-  delete: 'DELETE'
-}
+utils.defaultRequestMethods = {}
+utils.methods.forEach((method) => {
+  utils.defaultRequestMethods[method] = method
+})
 
 utils.mergeOptions = function merge (opts, options) {
   options = utils.extend({}, options)
