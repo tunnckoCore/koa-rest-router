@@ -76,22 +76,20 @@
       "list": [
         "koa-better-ratelimit",
         "koa-better-body",
+        "koa-better-serve",
+        "koa-better-router",
         "koa-ip-filter",
         "koa-bel",
         "nanomatch"
       ]
     },
-    "reflinks": [
-      "micromatch",
-      "through2",
-      "use",
-      "vinyl",
-      "koa",
-      "koa-convert",
-      "koa-send"
-    ],
     "lint": {
       "reflinks": true
-    }
+    },
+    "reflinks": [
+      "koa",
+      "koa-send",
+      "path-match"
+    ]
   }
 }
