@@ -20,14 +20,6 @@ utils.r = function r (name, id, edit) {
   return url
 }
 
-utils.cloneArray = function cloneArray (arr) {
-  let res = []
-  for (const item of arr) {
-    res.push(item)
-  }
-  return res
-}
-
 utils.createPath = function createPath (ctx, destRoute) {
   let route = destRoute.route.slice(1)
   if (!route.length) return '/:id'
