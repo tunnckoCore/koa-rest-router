@@ -104,14 +104,14 @@ util.inherits(KoaRestRouter, utils.Router)
  *
  * // returns Route Object
  * // each resource creates 7 routes
- * let users = router.createResouce('users', {
+ * let users = router.createResource('users', {
  *   index: function (ctx, next) {}
  *   // ... etc
  * })
  * console.log(users)
  *
  * console.log(router.routes.length) // 0
- * console.log(router.resources.length) // 0
+ * console.log(router.resources.length) // 1
  *
  * router.addRoutes(foo, users)
  *
@@ -205,7 +205,7 @@ KoaRestRouter.prototype.getResources = function getResources () {
 /**
  * > Get single resource by `name`. Special case is resource
  * to the `/` prefix. So pass `/` as `name`. See more on what
- * are the _"Route Objects"_ in the [koa-better-body][] docs.
+ * are the _"Route Objects"_ in the [koa-better-router][] docs.
  * What that method returns, I call _"Resource Object"_ - array
  * of _"Route Objects"_
  *
@@ -287,7 +287,7 @@ KoaRestRouter.prototype.addResource = function addResource (resource) {
 }
 
 /**
- * > Creates a resource using `.createResouce` and adds
+ * > Creates a resource using `.createResource` and adds
  * the resource routes to the `this.routes` array, using `.addResource`.
  * This is not an alias! It is combination of two methods. Methods
  * that are not defined in given `ctrl` (controller) returns
