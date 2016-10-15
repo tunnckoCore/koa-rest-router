@@ -8,53 +8,20 @@ let apiRouter = new Router({
   prefix: '/api/v1'
 })
 
-let companies = apiRouter.createResource('companies', {
+let ctrl = {
   show: function * (next) {
     this.body = `path is ${this.route.path}, haha`
     this.body = `${this.body}!! :company is ${this.params.company}, yea`
     yield next
   }
-})
-let profiles = apiRouter.createResource('profiles', {
-  show: function (ctx, next) {
-    ctx.body = `path is ${ctx.route.path}, hoho`
-    ctx.body = `${ctx.body} profile is ${ctx.params.profile}, wohoo`
-    ctx.body = `${ctx.body} ${JSON.stringify(ctx.params, null, 2)}`
-    return next()
-  }
-})
-let users = apiRouter.createResource('users', {
-  show: function (ctx, next) {
-    ctx.body = `path is ${ctx.route.path}, hoho`
-    ctx.body = `${ctx.body} profile is ${ctx.params.profile}, wohoo`
-    ctx.body = `${ctx.body} ${JSON.stringify(ctx.params, null, 2)}`
-    return next()
-  }
-})
-let docs = apiRouter.createResource('docs', {
-  show: function (ctx, next) {
-    ctx.body = `path is ${ctx.route.path}, hoho`
-    ctx.body = `${ctx.body} profile is ${ctx.params.profile}, wohoo`
-    ctx.body = `${ctx.body} ${JSON.stringify(ctx.params, null, 2)}`
-    return next()
-  }
-})
-let bars = apiRouter.createResource('bars', {
-  show: function (ctx, next) {
-    ctx.body = `path is ${ctx.route.path}, hoho`
-    ctx.body = `${ctx.body} profile is ${ctx.params.profile}, wohoo`
-    ctx.body = `${ctx.body} ${JSON.stringify(ctx.params, null, 2)}`
-    return next()
-  }
-})
-let cats = apiRouter.createResource('cats', {
-  show: function (ctx, next) {
-    ctx.body = `path is ${ctx.route.path}, hoho`
-    ctx.body = `${ctx.body} profile is ${ctx.params.profile}, wohoo`
-    ctx.body = `${ctx.body} ${JSON.stringify(ctx.params, null, 2)}`
-    return next()
-  }
-}/*, {prefix: '/foo'} works too, overrides the api prefix */)
+}
+
+let companies = apiRouter.createResource('companies', ctrl)
+let profiles = apiRouter.createResource('profiles', ctrl)
+let users = apiRouter.createResource('users', ctrl)
+let docs = apiRouter.createResource('docs', ctrl)
+let bars = apiRouter.createResource('bars', ctrl)
+let cats = apiRouter.createResource('cats', ctrl)
 
 let one = apiRouter.group(companies, profiles)
 one.forEach((route) => console.log(route.route))
