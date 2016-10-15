@@ -4,6 +4,23 @@
 
 [![code climate][codeclimate-img]][codeclimate-url] [![standard code style][standard-img]][standard-url] [![travis build status][travis-img]][travis-url] [![coverage status][coveralls-img]][coveralls-url] [![dependency status][david-img]][david-url]
 
+## Table of Contents
+- [Install](#install)
+- [Usage](#usage)
+- [API](#api)
+  * [KoaRestRouter](#koarestrouter)
+  * [.addRoutes](#addroutes)
+  * [.getRoutes](#getroutes)
+  * [.resource](#resource)
+  * [.addResource](#addresource)
+  * [.getResource](#getresource)
+  * [.createResource](#createresource)
+  * [.addResources](#addresources)
+  * [.getResources](#getresources)
+  * [.group](#group)
+- [Related](#related)
+- [Contributing](#contributing)
+
 ## Install
 
 ```
@@ -20,6 +37,8 @@ let router = require('koa-rest-router')()
 let Router = require('koa-rest-router')
 let apiRouter = Router({ prefix: '/api/v1' })
 ```
+
+## API
 
 ### [KoaRestRouter](index.js#L72)
 > Initialize `KoaRestRouter` with optional `options`, directly passed to [koa-better-router][] and this package inherits it. So you have all methods and functionality from the awesome [koa-better-router][] middleware.
@@ -137,105 +156,7 @@ console.log(router.routes.length) // 2
 console.log(router.getRoutes().length) // 2
 ```
 
-### [.addResources](index.js#L171)
-
-> Just an alias for `.addRoutes`.
-
-**Params**
-
-* `...args` **{Array}**: any number of arguments (arrays of route objects)    
-* `returns` **{KoaRestRouter}** `this`: instance for chaining  
-
-### [.getResources](index.js#L209)
-> As we have `.getRoutes` method for getting `this.routes`, so we have `.getResources` for getting `this.resources` array, too. Each `.createResource` returns array of route objects with length of 7, so 7 routes. So if you call `.createResource` two times the `this.resources` (what this method returns) will contain 2 arrays with 7 routes in each of them.
-
-* `returns` **{Array}**: array of arrays of route objects  
-
-**Example**
-
-```js
-let router = require('koa-rest-router')().loadMethods()
-
-console.log(router.routes.length)          // 0
-console.log(router.getRoutes().length)     // 0
-
-console.log(router.resources.length)       // 0
-console.log(router.getResources().length)  // 0
-
-router.get('/about', (ctx, next) => {})
-router.resource('dogs')
-router.resource('cats')
-
-console.log(router.routes.length)          // 15
-console.log(router.getRoutes().length)     // 15
-
-console.log(router.resources.length)       // 2
-console.log(router.getResources().length)  // 2
-```
-
-### [.getResource](index.js#L247)
-> Get single resource by `name`. Special case is resource to the `/` prefix. So pass `/` as `name`. See more on what are the _"Route Objects"_ in the [koa-better-router][] docs. What that method returns, I call _"Resource Object"_ - array of _"Route Objects"_
-
-**Params**
-
-* `name` **{String}**: name of the resource, plural    
-* `returns` **{Array|Null}**: if resource with `name` not found `null, otherwise array of route objects - that array is known as Resource Object  
-
-**Example**
-
-```js
-let api = require('koa-rest-router')({
-  prefix: '/api/v2'
-})
-
-let frogs = api.createResource('frogs')
-let dragons = api.createResource('dragons')
-
-console.log(api.getResource('frogs'))
-// array of route objects
-// => [
-//   { prefix: '/api/v2', route: '/frogs', path: '/api/v2/frogs', ... }
-//   { prefix: '/api/v2', route: '/frogs/:frog', path: '/api/v2/frogs/:frog', ... }
-//   ... and 5 more routes
-// ]
-
-console.log(api.getResources().length) // 2
-```
-
-### [.addResource](index.js#L293)
-> Simple method that is alias of `.addRoutes` and `.addResources`, but for adding single resource. It can accepts only one `resource` object.
-
-**Params**
-
-* `resource` **{Array}**: array of route objects, known as _"Resource Object"_    
-* `returns` **{KoaRestRouter}** `this`: instance for chaining  
-
-**Example**
-
-```js
-let Router = require('koa-rest-router')
-let api = new Router({
-  prefix: '/'
-})
-
-console.log(api.resources.length) // 0
-console.log(api.routes.length) // 0
-
-api.addResource(api.createResource('dragons'))
-
-console.log(api.resources.length) // 1
-console.log(api.routes.length) // 7
-
-console.log(api.getResouce('dragons'))
-// array of route objects
-// => [
-//   { prefix: '/', route: '/dragons', path: '/dragons', ... }
-//   { prefix: '/', route: '/dragons/:dragon', path: '/dragons/:dragon', ... }
-//   ... and 5 more routes
-// ]
-```
-
-### [.resource](index.js#L398)
+### [.resource](index.js#L264)
 > Creates a resource using `.createResource` and adds the resource routes to the `this.routes` array, using `.addResource`. This is not an alias! It is combination of two methods. Methods that are not defined in given `ctrl` (controller) returns by default `501 Not Implemented`. You can override any defaults - default request methods and default controller methods, just by passing respectively `opts.methods` object and `opts.map` object.
 
 **Params**
@@ -330,8 +251,70 @@ app.listen(4433, () => {
 })
 ```
 
-### [.createResource](index.js#L499)
-> Core method behind `.resource` for creating single resource with a `name`, but without adding it to `this.routes` array. You can override any defaults - default request methods and default controller methods, just by passing respectively `opts.methods` object and `opts.map` object.
+### [.addResource](index.js#L304)
+> Simple method that is alias of `.addRoutes` and `.addResources`, but for adding single resource. It can accepts only one `resource` object.
+
+**Params**
+
+* `resource` **{Array}**: array of route objects, known as _"Resource Object"_    
+* `returns` **{KoaRestRouter}** `this`: instance for chaining  
+
+**Example**
+
+```js
+let Router = require('koa-rest-router')
+let api = new Router({
+  prefix: '/'
+})
+
+console.log(api.resources.length) // 0
+console.log(api.routes.length) // 0
+
+api.addResource(api.createResource('dragons'))
+
+console.log(api.resources.length) // 1
+console.log(api.routes.length) // 7
+
+console.log(api.getResouce('dragons'))
+// array of route objects
+// => [
+//   { prefix: '/', route: '/dragons', path: '/dragons', ... }
+//   { prefix: '/', route: '/dragons/:dragon', path: '/dragons/:dragon', ... }
+//   ... and 5 more routes
+// ]
+```
+
+### [.getResource](index.js#L342)
+> Get single resource by `name`. Special case is resource to the `/` prefix. So pass `/` as `name`. See more on what are the _"Route Objects"_ in the [koa-better-router][] docs. What that method returns, I call _"Resource Object"_ - array of _"Route Objects"_
+
+**Params**
+
+* `name` **{String}**: name of the resource, plural    
+* `returns` **{Array|Null}**: if resource with `name` not found `null, otherwise array of route objects - that array is known as Resource Object  
+
+**Example**
+
+```js
+let api = require('koa-rest-router')({
+  prefix: '/api/v2'
+})
+
+let frogs = api.createResource('frogs')
+let dragons = api.createResource('dragons')
+
+console.log(api.getResource('frogs'))
+// array of route objects
+// => [
+//   { prefix: '/api/v2', route: '/frogs', path: '/api/v2/frogs', ... }
+//   { prefix: '/api/v2', route: '/frogs/:frog', path: '/api/v2/frogs/:frog', ... }
+//   ... and 5 more routes
+// ]
+
+console.log(api.getResources().length) // 2
+```
+
+### [.createResource](index.js#L450)
+> Core method behind `.resource` for creating single resource with a `name`, but without adding it to `this.routes` array. You can override any defaults - default request methods and default controller methods, just by passing respectively `opts.methods` object and `opts.map` object. It uses [koa-better-router][]'s `.createRoute` under the hood.
 
 **Params**
 
@@ -422,7 +405,43 @@ app.listen(5000, () => {
 })
 ```
 
-### [.group](index.js#L617)
+### [.addResources](index.js#L512)
+
+> Just an alias for `.addRoutes`.
+
+**Params**
+
+* `...args` **{Array}**: any number of arguments (arrays of route objects)    
+* `returns` **{KoaRestRouter}** `this`: instance for chaining  
+
+### [.getResources](index.js#L550)
+> As we have `.getRoutes` method for getting `this.routes`, so we have `.getResources` for getting `this.resources` array, too. Each `.createResource` returns array of route objects with length of 7, so 7 routes. So if you call `.createResource` two times the `this.resources` (what this method returns) will contain 2 arrays with 7 routes in each of them.
+
+* `returns` **{Array}**: array of arrays of route objects  
+
+**Example**
+
+```js
+let router = require('koa-rest-router')().loadMethods()
+
+console.log(router.routes.length)          // 0
+console.log(router.getRoutes().length)     // 0
+
+console.log(router.resources.length)       // 0
+console.log(router.getResources().length)  // 0
+
+router.get('/about', (ctx, next) => {})
+router.resource('dogs')
+router.resource('cats')
+
+console.log(router.routes.length)          // 15
+console.log(router.getRoutes().length)     // 15
+
+console.log(router.resources.length)       // 2
+console.log(router.getResources().length)  // 2
+```
+
+### [.group](index.js#L618)
 > Powerful method for grouping couple of resources into one resource endpoint. For example you have `/cats` and `/dogs` endpoints, but you wanna create `/cats/:cat/dogs/:dog` endpoint, so you can do such things with that. You can group infinite number of resources. Useful methods that gives you what you should pass as arguments here are `.createResource`, `.createRoute`, `.getResources`, `.getResource` and `.getRoutes`. **Note:** Be aware of that it replaces middlewares of `dest` with the middlewares of last `src`.
 
 **Params**
