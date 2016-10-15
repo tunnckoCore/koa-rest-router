@@ -64,6 +64,12 @@ test('should have empty `.routes` array on initialization', function (done) {
   done()
 })
 
+test('should have empty `.resources` array on initialization', function (done) {
+  test.strictEqual(Array.isArray(router.resources), true)
+  test.strictEqual(router.resources.length, 0)
+  done()
+})
+
 test('should `.addRoute` throw TypeError if `method` a string', function (done) {
   function fixture () {
     router.addRoute(123)
