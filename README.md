@@ -4,6 +4,10 @@
 
 [![code climate][codeclimate-img]][codeclimate-url] [![standard code style][standard-img]][standard-url] [![travis build status][travis-img]][travis-url] [![coverage status][coveralls-img]][coveralls-url] [![dependency status][david-img]][david-url]
 
+### Attention
+
+It seems this package was created at `2015-01-22T23:09:00.237Z` and later is unpublish. So use with an attention. It is easy fix instead of publishig `0.5.0` as I thougth (_and noticed this fact that there are `0.5.0`, `0.5.2`, `0.6.0`, `0.6.3` and `0.7.0` already published versions_) **I'll just bump to `0.8.0` now**. Hopefully last before **stable v1** and will **deprecate** all previous versions! I just need to get `v1.2` of [koa-better-router][] finished tomorrow. It is pretty stable now and there no plans for something new, but wanna clean few more things and docs.
+
 ## Table of Contents
 - [Install](#install)
 - [Usage](#usage)
