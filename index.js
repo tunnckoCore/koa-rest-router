@@ -498,14 +498,14 @@ KoaRestRouter.prototype.getResources = function getResources () {
  * let dogs = router.createResource('dogs')
  *
  * // endpoint: /companies/:company/departments/:department
- * let one = router.group(companies, departments)
+ * let one = router.groupResources(companies, departments)
  *
  * // endpoint: /profiles/:profile/clients/:client/cats/:cat
- * let two = router.group(profiles, clients, cats)
+ * let two = router.groupResources(profiles, clients, cats)
  *
  * // crazy? huh, AWESOME!
  * // endpoint: /companies/:company/departments/:department/profiles/:profile/clients/:client/cats/:cat
- * let foo = router.group(one, two)
+ * let foo = router.groupResources(one, two)
  *
  * // but actually just "register" `one` and `foo`
  * // so you WON'T have `/profiles/:profile/clients/:client/cats/:cat`
