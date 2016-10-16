@@ -25,10 +25,14 @@ test('should expose constructor', function (done) {
 })
 
 test('should have `koa-better-router` methods', function (done) {
-  test.strictEqual(typeof router.addRoute, 'function')
   test.strictEqual(typeof router.createRoute, 'function')
-  test.strictEqual(typeof router.middleware, 'function')
+  test.strictEqual(typeof router.addRoute, 'function')
+  test.strictEqual(typeof router.getRoute, 'function')
+  test.strictEqual(typeof router.addRoutes, 'function')
+  test.strictEqual(typeof router.getRoutes, 'function')
+  test.strictEqual(typeof router.groupRoutes, 'function')
   test.strictEqual(typeof router.loadMethods, 'function')
+  test.strictEqual(typeof router.middleware, 'function')
   test.strictEqual(typeof router.legacyMiddleware, 'function')
   done()
 })

@@ -23,7 +23,7 @@
   "dependencies": {
     "extend-shallow": "^2.0.1",
     "inflection": "^1.10.0",
-    "koa-better-router": "^1.1.0",
+    "koa-better-router": "git+https://github.com/tunnckoCore/koa-better-router.git",
     "lazy-cache": "^2.0.1",
     "methods": "^1.1.2"
   },

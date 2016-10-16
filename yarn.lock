@@ -218,8 +218,8 @@ babel-types@^6.10.2, babel-types@^6.16.0:
     to-fast-properties "^1.0.1"
 
 babylon@^6.11.0, babylon@^6.8.1:
-  version "6.11.6"
-  resolved "https://registry.yarnpkg.com/babylon/-/babylon-6.11.6.tgz#56dc52e624882841c7fe095257fbcb4a5bb61ae1"
+  version "6.12.0"
+  resolved "https://registry.yarnpkg.com/babylon/-/babylon-6.12.0.tgz#953e6202e58062f7f5041fc8037e4bd4e17140a9"
 
 balanced-match@^0.4.1:
   version "0.4.2"
@@ -551,8 +551,8 @@ conventional-commits-filter@^1.0.0:
     modify-values "^1.0.0"
 
 conventional-commits-parser@^1.0.0, conventional-commits-parser@^1.0.1:
-  version "1.2.3"
-  resolved "https://registry.yarnpkg.com/conventional-commits-parser/-/conventional-commits-parser-1.2.3.tgz#fc42492d1502fa3b307c1a8e45a8c5b0932fc322"
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/conventional-commits-parser/-/conventional-commits-parser-1.3.0.tgz#e327b53194e1a7ad5dc63479ee9099a52b024865"
   dependencies:
     is-text-path "^1.0.0"
     JSONStream "^1.0.4"
@@ -1776,9 +1776,9 @@ kind-of@^3.0.2:
   dependencies:
     is-buffer "^1.0.2"
 
-koa-better-router@^1.1.0:
+"koa-better-router@git+https://github.com/tunnckoCore/koa-better-router.git":
   version "1.1.0"
-  resolved "https://registry.yarnpkg.com/koa-better-router/-/koa-better-router-1.1.0.tgz#5b146d2d9d858e594ec666d00895850d048537b2"
+  resolved "git+https://github.com/tunnckoCore/koa-better-router.git#942f94f7c4a74362f422cd1bde41a59ddbd7b7c3"
   dependencies:
     extend-shallow "^2.0.1"
     is-es6-generator-function "^1.0.0"
@@ -3036,9 +3036,10 @@ yargs@^4.6.0:
     yargs-parser "^2.4.1"
 
 yargs@^6.0.0:
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/yargs/-/yargs-6.0.0.tgz#900479df4e8bf6ab0e87216f5ed2b2760b968345"
+  version "6.1.1"
+  resolved "https://registry.yarnpkg.com/yargs/-/yargs-6.1.1.tgz#95968cdd9bda89d973215b43969b2c82ce0c8032"
   dependencies:
+    camelcase "^3.0.0"
     cliui "^3.2.0"
     decamelize "^1.1.1"
     get-caller-file "^1.0.1"

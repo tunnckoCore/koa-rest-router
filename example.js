@@ -23,13 +23,13 @@ let docs = apiRouter.createResource('docs', ctrl)
 let bars = apiRouter.createResource('bars', ctrl)
 let cats = apiRouter.createResource('cats', ctrl)
 
-let one = apiRouter.group(companies, profiles)
+let one = apiRouter.groupResources(companies, profiles)
 one.forEach((route) => console.log(route.route))
 
-let two = apiRouter.group(users, cats)
+let two = apiRouter.groupResources(users, cats)
 two.forEach((route) => console.log(route.route))
 
-let three = apiRouter.group(one, two)
+let three = apiRouter.groupResources(one, two)
 three.forEach((route) => console.log(route.route))
 
 console.log(apiRouter.routes.length) // 0
@@ -40,7 +40,7 @@ console.log(apiRouter.routes.length) // 7
 apiRouter.addRoutes(docs, bars)
 console.log(apiRouter.routes.length) // 21
 
-let megalong = apiRouter.group(docs, two, bars, three)
+let megalong = apiRouter.groupResources(docs, two, bars, three)
 console.log(megalong.length) // 7
 megalong.forEach((route) => console.log(route.route))
 

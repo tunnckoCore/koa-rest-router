@@ -20,7 +20,7 @@ utils.r = function r (name, id, edit) {
   return url
 }
 
-utils.createPath = function createPath (ctx, destRoute) {
+utils.updatePath = function updatePath (ctx, destRoute) {
   let route = destRoute.route.slice(1)
   if (!route.length) return '/:id'
   route = route.replace(ctx.options.prefix, '')
@@ -41,11 +41,6 @@ utils.createPath = function createPath (ctx, destRoute) {
     }
   }
   return `/${res.join('/')}`
-}
-
-utils.createRouteObject = function createRouteObject (ctx, dest, src, idx) {
-  let pathname = utils.createPath(ctx, dest) + src[idx].route
-  return ctx.createRoute(dest.method, pathname, src[idx].middlewares)
 }
 
 utils.notImplemented = function notImplemented () {
