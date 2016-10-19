@@ -10,6 +10,11 @@ let apiRouter = new Router({
 
 let ctrl = {
   show: function * (next) {
+    console.log('=')
+    console.log(this.originUrl)
+    console.log(this.origin)
+    console.log(this.hostname)
+    console.log(this.host)
     this.body = `path is ${this.route.path}, haha`
     this.body = `${this.body}!! :company is ${this.params.company}, yea`
     yield next
