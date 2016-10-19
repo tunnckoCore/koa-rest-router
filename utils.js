@@ -86,6 +86,32 @@ utils.mergeOptions = function merge (opts, options) {
   return opts
 }
 
+utils.createResourceRoutes = function createResourceRoutes (route, param, ctrl) {
+  return function (self, opts) {
+    self.options = utils.mergeOptions(self.options, opts)
+    ctrl = utils.extend({}, utils.defaultController, ctrl)
+
+    // map controller methods to be called
+    let map = self.options.map
+
+    // map request methods to be used
+    let m = self.options.methods
+    m.del = m.del || m.delete
+
+    // create RESTful routes
+    let src = []
+    src.push(self.createRoute(m.get, utils.r(route), ctrl[map.index]))
+    src.push(self.createRoute(m.get, utils.r(route, 'new'), ctrl[map.new]))
+    src.push(self.createRoute(m.post, utils.r(route), ctrl[map.create]))
+    src.push(self.createRoute(m.get, utils.r(route, param), ctrl[map.show]))
+    src.push(self.createRoute(m.get, utils.r(route, param, 'edit'), ctrl[map.edit]))
+    src.push(self.createRoute(m.put, utils.r(route, param), ctrl[map.update]))
+    src.push(self.createRoute(m.del, utils.r(route, param), ctrl[map.remove]))
+
+    return src
+  }
+}
+
 /**
  * Expose `utils` modules
  */

@@ -93,10 +93,10 @@ test('should `.addRoute` throw TypeError route not a string, array or function',
 })
 
 test('should create REST 7 routes and 1 resource using `.resource` method', function (done) {
-  let routerSelf = router.resource('users')
+  let routerSelf = Router().resource('users')
   test.strictEqual(routerSelf.resources.length, 1)
   test.strictEqual(routerSelf.routes.length, 7)
-  router.resource('cats')
+  routerSelf.resource('cats')
   test.strictEqual(routerSelf.resources.length, 2)
   test.strictEqual(routerSelf.routes.length, 14)
   done()

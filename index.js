@@ -188,41 +188,11 @@ KoaRestRouter.prototype.createResource = function createResource (name, ctrl, op
   if (typeof name !== 'string') {
     name = '/'
   }
+
   let _name = name[0] === '/' ? name.slice(1) : name
-  let route = name !== '/'
-    ? utils.inflection.pluralize(_name)
-    : ''
-  let param = name !== '/'
-    ? ':' + utils.inflection.singularize(_name)
-    : ':id'
-
-  this.options = utils.mergeOptions(this.options, opts)
-  ctrl = utils.extend({}, utils.defaultController, ctrl)
-
-  // map request methods to be used
-  let _get = this.options.methods.get
-  let _put = this.options.methods.put
-  let _del = this.options.methods.del || this.options.methods.delete
-  let _post = this.options.methods.post
-
-  // map controller methods to be called
-  let _index = this.options.map.index
-  let _new = this.options.map.new
-  let _create = this.options.map.create
-  let _show = this.options.map.show
-  let _edit = this.options.map.edit
-  let _update = this.options.map.update
-  let _remove = this.options.map.remove
-
-  // create RESTful routes
-  let src = []
-  src.push(this.createRoute(_get, utils.r(route), ctrl[_index]))
-  src.push(this.createRoute(_get, utils.r(route, 'new'), ctrl[_new]))
-  src.push(this.createRoute(_post, utils.r(route), ctrl[_create]))
-  src.push(this.createRoute(_get, utils.r(route, param), ctrl[_show]))
-  src.push(this.createRoute(_get, utils.r(route, param, 'edit'), ctrl[_edit]))
-  src.push(this.createRoute(_put, utils.r(route, param), ctrl[_update]))
-  src.push(this.createRoute(_del, utils.r(route, param), ctrl[_remove]))
+  let route = name !== '/' ? utils.inflection.pluralize(_name) : ''
+  let param = name !== '/' ? ':' + utils.inflection.singularize(_name) : ':id'
+  let src = utils.createResourceRoutes(route, param, ctrl)(this, opts)
 
   // add them to cache
   src.name = route === '' ? '/' : route
