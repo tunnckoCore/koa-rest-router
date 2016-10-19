@@ -191,7 +191,7 @@ app.listen(5000, () => {
 })
 ```
 
-### [.addResource](index.js#L271)
+### [.addResource](index.js#L241)
 > Simple method that is alias of `.addRoutes` and `.addResources`, but for adding single resource. It can accepts only one `resource` object.
 
 **Params**
@@ -224,7 +224,7 @@ console.log(api.getResouce('dragons'))
 // ]
 ```
 
-### [.getResource](index.js#L309)
+### [.getResource](index.js#L279)
 > Get single resource by `name`. Special case is resource to the `/` prefix. So pass `/` as `name`. See more on what are the _"Route Objects"_ in the [koa-better-router][] docs. What that method returns, I call _"Resource Object"_ - array of _"Route Objects"_
 
 **Params**
@@ -253,7 +253,7 @@ console.log(api.getResource('frogs'))
 console.log(api.getResources().length) // 2
 ```
 
-### [.resource](index.js#L421)
+### [.resource](index.js#L391)
 > Creates a resource using `.createResource` and adds the resource routes to the `this.routes` array, using `.addResource`. This is not an alias! It is combination of two methods. Methods that are not defined in given `ctrl` (controller) returns by default `501 Not Implemented`. You can override any defaults - default request methods and default controller methods, just by passing respectively `opts.methods` object and `opts.map` object.
 
 **Params**
@@ -348,7 +348,7 @@ app.listen(4433, () => {
 })
 ```
 
-### [.addResources](index.js#L434)
+### [.addResources](index.js#L404)
 
 > Just an alias of [koa-better-router][]'s' `.addRoutes` method.
 
@@ -357,7 +357,7 @@ app.listen(4433, () => {
 * `...args` **{Array}**: any number of arguments (arrays of route objects)    
 * `returns` **{KoaRestRouter}** `this`: instance for chaining  
 
-### [.getResources](index.js#L472)
+### [.getResources](index.js#L442)
 > As we have `.getRoutes` method for getting `this.routes`, so we have `.getResources` for getting `this.resources` array, too. Each `.createResource` returns array of route objects with length of 7, so 7 routes. So if you call `.createResource` two times the `this.resources` (what this method returns) will contain 2 arrays with 7 routes in each of them.
 
 * `returns` **{Array}**: array of arrays of route objects  
@@ -384,7 +384,7 @@ console.log(router.resources.length)       // 2
 console.log(router.getResources().length)  // 2
 ```
 
-### [.groupResources](index.js#L538)
+### [.groupResources](index.js#L508)
 > Powerful method for grouping couple of resources into one resource endpoint. For example you have `/cats` and `/dogs` endpoints, but you wanna create `/cats/:cat/dogs/:dog` endpoint, so you can do such things with that. You can group infinite number of resources. Useful methods that gives you what you should pass as arguments here are `.createResource`, `.createRoute`, `.getResources`, `.getResource` and `.getRoutes`. **Note:** Be aware of that it replaces middlewares of `dest` with the middlewares of last `src`.
 
 **Params**
