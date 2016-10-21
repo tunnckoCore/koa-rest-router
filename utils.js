@@ -20,8 +20,9 @@ utils.r = function r (name, id, edit) {
   return url
 }
 
-utils.updatePath = function updatePath (ctx, destRoute) {
+utils.updateRoute = function updateRoute (ctx, destRoute) {
   let route = destRoute.route.slice(1)
+  /* istanbul ignore next */
   if (!route.length) return '/:id'
   route = route.replace(ctx.options.prefix, '')
 
@@ -40,11 +41,13 @@ utils.updatePath = function updatePath (ctx, destRoute) {
       res.push(`:${singular}`)
     }
   }
-  return `/${res.join('/')}`
+
+  destRoute.route = `/${res.join('/')}`
+  return destRoute
 }
 
 utils.notImplemented = function notImplemented () {
-  return function (ctx, next) {
+  return function notImplemented_ (ctx, next) {
     ctx.status = 501
     ctx.body = 'Not Implemented'
     return next()

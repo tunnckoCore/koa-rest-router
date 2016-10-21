@@ -507,14 +507,13 @@ KoaRestRouter.prototype.getResources = function getResources () {
 
 KoaRestRouter.prototype.groupResources = function groupResources (dest, src1, src2) {
   return dest.map((destRoute, index) => {
-    destRoute.route = utils.updatePath(this, destRoute)
-    let route = this.groupRoutes(destRoute, src1[index])
+    let route = utils.updateRoute(this, destRoute)
+    route = this.groupRoutes(route, src1[index])
 
-    if (src2 && Array.isArray(src2)) {
-      route.route = utils.updatePath(this, route)
-      return this.groupRoutes(route, src2[index])
-    }
-    return route
+    /* istanbul ignore next */
+    return src2 && Array.isArray(src2)
+      ? this.groupRoutes(utils.updateRoute(this, route), src2[index])
+      : route
   })
 }
 

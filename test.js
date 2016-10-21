@@ -9,12 +9,11 @@
 
 'use strict'
 
-let request = require('supertest')
-let test = require('mukla')
-let Koa = require('koa')
-let Router = require('./index')
-let router = Router()
-let app = new Koa()
+const request = require('supertest')
+const test = require('mukla')
+const Koa = require('koa')
+const Router = require('./index')
+const router = Router()
 
 test('should expose constructor', function (done) {
   test.strictEqual(typeof Router, 'function')
@@ -33,6 +32,10 @@ test('should have `koa-better-router` methods', function (done) {
   test.strictEqual(typeof router.groupRoutes, 'function')
   test.strictEqual(typeof router.loadMethods, 'function')
   test.strictEqual(typeof router.middleware, 'function')
+  test.strictEqual(typeof router.createResource, 'function')
+  test.strictEqual(typeof router.addResource, 'function')
+  test.strictEqual(typeof router.addResources, 'function')
+  test.strictEqual(typeof router.getResource, 'function')
   test.strictEqual(typeof router.legacyMiddleware, 'function')
   done()
 })
@@ -54,6 +57,42 @@ test('should have HTTP verbs as methods when `.loadMethods` is called', function
   test.strictEqual(typeof api.get, 'function')
   test.strictEqual(typeof api.post, 'function')
   test.strictEqual(typeof api.patch, 'function')
+  done()
+})
+
+test('should get single resource by plural name - `.getResource(name)`', function (done) {
+  let r = (new Router()).resource('foobar')
+  let resource = r.getResource('foobars')
+
+  test.strictEqual(typeof resource, 'object')
+  test.strictEqual(Array.isArray(resource), true)
+  test.strictEqual(resource.length, 7) // 7 Route Objects
+  test.deepStrictEqual(resource[1].route, '/foobars/new')
+  done()
+})
+
+test('should `.getResource` return null if not found', function (done) {
+  let ro = Router().resource('foo')
+  test.strictEqual(ro.getResources().length, 1)
+  test.strictEqual(ro.getResource('bar'), null)
+  done()
+})
+
+test('should get all resources using `.getResources`', function (done) {
+  let ruter = Router({ prefix: '/api' })
+  ruter.resource('dogs').createResource()
+
+  let resources = ruter.getResources()
+  test.strictEqual(Array.isArray(resources), true)
+  test.strictEqual(resources.length, 2)
+  test.strictEqual(resources[0].length, 7)
+  test.strictEqual(resources[1].length, 7)
+  test.strictEqual(resources[0][1].path, '/api/dogs/new')
+  test.strictEqual(resources[0][1].route, '/dogs/new')
+  test.strictEqual(resources[1][1].path, '/api/new')
+  test.strictEqual(resources[1][1].route, '/new')
+  test.strictEqual(ruter.resources[0][1].path, '/api/dogs/new')
+  test.strictEqual(ruter.resources[1][1].path, '/api/new')
   done()
 })
 
@@ -104,6 +143,87 @@ test('should create REST 7 routes and 1 resource using `.resource` method', func
   done()
 })
 
+test('should got `501 Not Implemented` if ctrl method not implemented', function (done) {
+  const r = new Router()
+  const serv = new Koa()
+
+  r.resource('fool', {
+    index: (ctx, next) => {}
+  })
+
+  serv.use(r.middleware())
+  request(serv.callback()).get('/fools/new').expect(501, /Not Implemented/)
+    .end(done)
+})
+
+test('should group resources using `.groupResources`', function (done) {
+  let server = new Koa()
+  let apiRouter = new Router({
+    prefix: '/api'
+  })
+  let companies = apiRouter.createResource('companies', {
+    show: function * (next) {
+      this.body = `companies: path is ${this.route.path}, haha`
+      this.body = `${this.body}!! :company is ${this.params.company}, yea`
+      yield next
+    }
+  })
+  let profiles = apiRouter.createResource('profiles', {
+    show: function (ctx, next) {
+      return next()
+    }
+  })
+  let cats = apiRouter.createResource('cats', {
+    show: function (ctx, next) {
+      ctx.body = `catsCtrl: path is ${ctx.route.path}, hoho`
+      ctx.body = `${ctx.body} :company is ${ctx.params.company}`
+      ctx.body = `${ctx.body} :profile is ${ctx.params.profile}`
+      ctx.body = `${ctx.body} :cat is ${ctx.params.cat}`
+      return next()
+    }
+  })
+
+  test.strictEqual(apiRouter.resources.length, 3)
+  test.strictEqual(apiRouter.routes.length, 0)
+  test.strictEqual(companies.length, 7)
+  test.strictEqual(profiles.length, 7)
+  test.strictEqual(cats.length, 7)
+
+  let resource = apiRouter.groupResources(companies, profiles, cats)
+
+  test.strictEqual(apiRouter.resources.length, 3)
+  test.strictEqual(apiRouter.routes.length, 0)
+  test.strictEqual(resource.length, 7)
+
+  // method `.addResource` works too
+  apiRouter.addResources(resource)
+
+  test.strictEqual(apiRouter.resources.length, 3)
+  test.strictEqual(apiRouter.routes.length, 7)
+
+  server.use(apiRouter.middleware())
+  request(server.callback())
+    .get('/api/companies/foo')
+    // we don't have `/api/companies` routes
+    // we don't have `/api/comapnies/:company/profiles/:profile` routes
+    // but we have `/companies/:company/profiles/:profile/cats` routes
+    .expect(404, function (err) {
+      test.ifError(err)
+
+      request(server.callback())
+        .get('/api/companies/foo/profiles/bar')
+        .expect(404).end(function () {
+          request(server.callback())
+            .get('/api/companies/foo/profiles/bar/cats/qux')
+            .expect(/:company is foo/)
+            .expect(/:profile is bar/)
+            .expect(/:cat is qux/)
+            .expect(200, /catsCtrl: path is/)
+            .end(done)
+        })
+    })
+})
+
 test('should be able to re-map controller methods through opitons', function (done) {
   let options = {
     map: {
@@ -121,7 +241,6 @@ test('should be able to re-map controller methods through opitons', function (do
   let app = new Koa()
 
   app.use(api.middleware({ prefix: '/api' }))
-
   request(app.callback()).get('/api/companies/123/edit').expect(/Hello world!/)
     .expect(200, /Edit company 123/)
     .end(done)
@@ -133,7 +252,8 @@ test('should be able to re-map request methods through options', function (done)
       get: 'post'
     }
   }
-  let api = Router()
+  let kkk = new Koa()
+  let api = new Router()
   api.resource({
     new: function * (next) {
       this.body = `Normally this is called with GET request`
@@ -142,72 +262,11 @@ test('should be able to re-map request methods through options', function (done)
     }
   }, options)
 
-  app.use(api.middleware())
-  request(app.callback())
+  kkk.use(api.middleware())
+  request(kkk.callback())
     .post('/new')
     .send({ foo: 'bar' })
-    .expect(200, /Normally this is called with GET request/)
+    .expect(/Normally this is called with GET request/)
     .expect(/but now it is called with POST request/)
-    .end(done)
+    .expect(200, done)
 })
-
-// test('should group two resources using `.group`', function (done) {
-//   let server = new Koa()
-//   let apiRouter = new Router({
-//     prefix: '/api'
-//   })
-//   let companies = apiRouter.createResource('companies', {
-//     show: function * (next) {
-//       this.body = `path is ${this.route.path}, haha`
-//       this.body = `${this.body}!! :company is ${this.params.company}, yea`
-//       yield next
-//     }
-//   })
-//   let profiles = apiRouter.createResource('profiles', {
-//     show: function (ctx, next) {
-//       ctx.body = `path is ${ctx.route.path}, hoho`
-//       ctx.body = `${ctx.body} profile is ${ctx.params.profile}, wohoo`
-//       return next()
-//     }
-//   })
-
-//   test.strictEqual(apiRouter.resources.length, 2)
-//   test.strictEqual(apiRouter.routes.length, 0)
-//   test.strictEqual(companies.length, 7)
-//   test.strictEqual(profiles.length, 7)
-
-//   // creates /api/companies/:company/profiles/:profile
-//   let resource = apiRouter.group(companies, profiles)
-//   test.strictEqual(apiRouter.resources.length, 2)
-//   test.strictEqual(apiRouter.routes.length, 0)
-//   test.strictEqual(resource.length, 7)
-
-//   apiRouter.addResource(resource)
-//   console.log(apiRouter.routes)
-//   // or
-//   // apiRouter.addRoutes(resource)
-
-//   server.use(apiRouter.middleware())
-//   request(server.callback())
-//     .get('/api/companies/foo')
-//     .expect(/path is \/api\/companies\/:company, haha/)
-//     .expect(/:company is foo, yea/)
-//     .expect(200, function (err) {
-//       test.ifError(err)
-
-//       request(app.callback())
-//         .get('/api/companies/22/profiles')
-//         // .expect(200, /path is \/api\/profiles\/:profile, hoho/)
-//         // .expect(/profile is 333, wohoo/)
-//         .expect(501)
-//         .end(function (err) {
-//           test.ifError(err)
-//           done()
-//           // request(app.callback())
-//           //   .get('/api/companies/22/profiles/55')
-//           //   .expect(/path is \/api\/companies\/:company\/profiles\/:profile, haha/)
-//           //   .expect(200, /profile is 55, wohoo/)
-//           //   .end(done)
-//         })
-//     })
-// })
