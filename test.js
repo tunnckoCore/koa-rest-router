@@ -68,9 +68,11 @@ test('should have empty `.routes` array on initialization', function (done) {
   done()
 })
 
-test('should have empty `.resources` array on initialization', function (done) {
-  test.strictEqual(Array.isArray(router.resources), true)
-  test.strictEqual(router.resources.length, 0)
+test('should have empty array `.resources` on init', function (done) {
+  let r = new Router()
+  let isArr = Array.isArray(r.resources)
+  test.strictEqual(isArr, true)
+  test.strictEqual(r.resources.length, 0)
   done()
 })
 
