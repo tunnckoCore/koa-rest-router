@@ -98,15 +98,43 @@ utils.createResourceRoutes = function createResourceRoutes (route, param, ctrl) 
     let m = self.options.methods
     m.del = m.del || m.delete
 
-    // create RESTful routes
     let src = []
-    src.push(self.createRoute(m.get, utils.r(route), ctrl[map.index]))
-    src.push(self.createRoute(m.get, utils.r(route, 'new'), ctrl[map.new]))
-    src.push(self.createRoute(m.post, utils.r(route), ctrl[map.create]))
-    src.push(self.createRoute(m.get, utils.r(route, param), ctrl[map.show]))
-    src.push(self.createRoute(m.get, utils.r(route, param, 'edit'), ctrl[map.edit]))
-    src.push(self.createRoute(m.put, utils.r(route, param), ctrl[map.update]))
-    src.push(self.createRoute(m.del, utils.r(route, param), ctrl[map.remove]))
+
+    /* eslint-disable no-multi-spaces */
+    let routes = [
+      [ m.get,  utils.r(route),                 ctrl[map.index] ],
+      [ m.get,  utils.r(route, 'new'),          ctrl[map.new] ],
+      [ m.post, utils.r(route),                 ctrl[map.create] ],
+      [ m.get,  utils.r(route, param),          ctrl[map.show] ],
+      [ m.get,  utils.r(route, param, 'edit'),  ctrl[map.edit] ],
+      [ m.put,  utils.r(route, param),          ctrl[map.update] ],
+      [ m.del,  utils.r(route, param),          ctrl[map.remove] ]
+    ]
+    /* eslint-enable no-multi-spaces */
+
+    // create RESTful routes
+    routes.forEach((args) => {
+      src.push(self.createRoute(args[0], args[1], args[2]))
+    })
+
+    /**
+     * I'm tired of that fucking non-stop tricking
+     * this fucking service - CodeClimate!
+     * Below is more human-readable and human-understandable
+     * variant of above shit. Thanks to god that there always
+     * have more ways to write one thing.
+     *
+     * The whole thing is that you just use `koa-better-router`'s
+     * `.createRoute` method which accepts METHOD, ROUTE and MIDDLEWARES.
+     * In addition we allow re-mapping of request and controller methods.
+     */
+    // src.push(self.createRoute(m.get, utils.r(route), ctrl[map.index]))
+    // src.push(self.createRoute(m.get, utils.r(route, 'new'), ctrl[map.new]))
+    // src.push(self.createRoute(m.post, utils.r(route), ctrl[map.create]))
+    // src.push(self.createRoute(m.get, utils.r(route, param), ctrl[map.show]))
+    // src.push(self.createRoute(m.get, utils.r(route, param, 'edit'), ctrl[map.edit]))
+    // src.push(self.createRoute(m.put, utils.r(route, param), ctrl[map.update]))
+    // src.push(self.createRoute(m.del, utils.r(route, param), ctrl[map.remove]))
 
     return src
   }
