@@ -4,6 +4,18 @@
 
 [![code climate][codeclimate-img]][codeclimate-url] [![standard code style][standard-img]][standard-url] [![travis build status][travis-img]][travis-url] [![coverage status][coveralls-img]][coveralls-url] [![dependency status][david-img]][david-url]
 
+## Highlighs
+- **production:** ready for and used in
+- **composability:** grouping multiple resources and multiple routers
+- **flexibility:** overriding controller and request methods, plus custom prefixes
+- **compatibility:** accepts both old and modern middlewares without deprecation messages
+- **powerful:** multiple routers on same [koa][] app - even can combine multiple routers
+- **light:** not poluting your router instance and app - see `.loadMethods`
+- **backward compatible:** works on koa v1 - use `.legacyMiddleware`
+- **maintainability:** very small, beautiful, maintainable and commented codebase
+- **stability:** strict semantic versioning and very well documented, based on [koa-better-router][]
+- **open:** love PRs for features, issues and recipes - [Contribute a recipe?](#contributing-recipes) See the [recipes](https://github.com/tunnckoCore/koa-better-router/tree/master/recipes) of [koa-better-router][]
+
 ## Table of Contents
 - [Quickstart](#quickstart)
   * [Controller methods mapping](#controller-methods-mapping)
@@ -22,6 +34,7 @@
   * [.groupResources](#groupresources)
 - [Related](#related)
 - [Contributing](#contributing)
+  * [Contributing Recipes](#contributing-recipes)
 
 **ProTip:** Checkout [koa-better-router API](https://github.com/tunnckoCore/koa-better-router#api) too to know what more methods comes with this.
 
@@ -595,6 +608,23 @@ app.listen(4000, () => {
 ## Contributing
 Pull requests and stars are always welcome. For bugs and feature requests, [please create an issue](https://github.com/tunnckoCore/koa-rest-router/issues/new).  
 But before doing anything, please read the [CONTRIBUTING.md](./CONTRIBUTING.md) guidelines.
+
+### Contributing Recipes
+Recipes are just different use cases, written in form of README in human language. Showing some "Pro Tips" and tricks, answering common questions and so on. They look like [tests](./test.js), but in more readable and understandable way for humans - mostly for beginners that not reads or understand enough the README or API and tests.
+
+- They are in form of folders in the root [`recipes/`](./recipes) folder: for example `recipes/[short-meaningful-recipe-name]/`.
+- In recipe folder should exist `README.md` file
+- In recipe folder there may have actual js files, too. And should be working.
+- The examples from the recipe README.md should also exist as separate `.js` files.
+- Examples in recipe folder also should be working and actual.
+
+It would be great if you follow these steps when you want to _fix, update or create_ a recipes. :sunglasses:
+
+- Title for recipe idea should start with `[recipe]`: for example`[recipe] my awesome recipe`
+- Title for new recipe (PR) should also start with `[recipe]`.
+- Titles of Pull Requests or Issues for fixing/updating some existing recipes should start with `[recipe-fix]`.
+
+It will help a lot, thanks in advance! :yum:
 
 ## [Charlike Make Reagent](http://j.mp/1stW47C) [![new message to charlike][new-message-img]][new-message-url] [![freenode #charlike][freenode-img]][freenode-url]
 
