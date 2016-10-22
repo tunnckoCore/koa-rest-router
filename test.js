@@ -230,7 +230,7 @@ test('should be able to re-map controller methods through opitons', function (do
       edit: 'foo'
     }
   }
-  let api = Router()
+  let api = Router({ prefix: '/api' })
   api.resource('companies', {
     foo: function (ctx, next) {
       ctx.body = `Hello world! Edit company ${ctx.params.company}.`
@@ -240,7 +240,7 @@ test('should be able to re-map controller methods through opitons', function (do
   }, options)
   let app = new Koa()
 
-  app.use(api.middleware({ prefix: '/api' }))
+  app.use(api.middleware())
   request(app.callback()).get('/api/companies/123/edit').expect(/Hello world!/)
     .expect(200, /Edit company 123/)
     .end(done)

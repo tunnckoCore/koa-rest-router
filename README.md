@@ -44,7 +44,7 @@ let apiRouter = Router({ prefix: '/api/v1' })
 
 ## API
 
-### [KoaRestRouter](index.js#L72)
+### [KoaRestRouter](index.js#L77)
 > Initialize `KoaRestRouter` with optional `options`, directly passed to [koa-better-router][] and this package inherits it. So you have all methods and functionality from the awesome [koa-better-router][] middleware.
 
 **Params**
@@ -56,8 +56,8 @@ let apiRouter = Router({ prefix: '/api/v1' })
 **Example**
 
 ```js
-let router = require('koa-rest-router')
-let api = router({ prefix: '/api/v1' })
+let Router = require('koa-rest-router')
+let api = Router({ prefix: '/api/v1' })
 
 // - can have multiples middlewares
 // - can have both old and modern middlewares combined
@@ -84,22 +84,27 @@ console.log(api.resources.length) // 2
 let Koa = require('koa') // Koa v2
 let app = new Koa()
 
+let basic = Router() // prefix is `/` by default
+basic.extend(api)
+
 app.use(api.middleware())
-app.use(api.middleware({ prefix: '/' }))
+app.use(basic.middleware())
 
 app.listen(4444, () => {
   console.log('Open http://localhost:4444 and try')
-
   // will output 2x14 links
   // - 14 links on `/api/v1` prefix
   // - 14 links on `/` prefix
   api.routes.forEach((route) => {
-    console.log(`${route.method} http://localhost:4444${route.route}`)
+    console.log(`${route.method} http://localhost:4444${route.path}`)
+  })
+  basic.routes.forEach((route) => {
+    console.log(`${route.method} http://localhost:4444${route.path}`)
   })
 })
 ```
 
-### [.createResource](index.js#L182)
+### [.createResource](index.js#L190)
 > Core method behind `.resource` for creating single resource with a `name`, but without adding it to `this.routes` array. You can override any defaults - default request methods and default controller methods, just by passing respectively `opts.methods` object and `opts.map` object. It uses [koa-better-router][]'s `.createRoute` under the hood.
 
 **Params**
@@ -112,7 +117,9 @@ app.listen(4444, () => {
 **Example**
 
 ```js
-let router = require('koa-rest-router')().loadMethods()
+let router = require('koa-rest-router')({
+  prefix: '/api'
+}).loadMethods()
 
 // The server part
 let body = require('koa-better-body')
@@ -180,7 +187,8 @@ console.log(router.getRoutes().length) // => 7
 console.log(router.getRoutes()) // or router.routes
 // => array of "Route Objects"
 
-app.use(router.middleware({ prefix: '/api' }))
+app.use(router.middleware())
+
 app.listen(5000, () => {
   console.log(`Server listening on http://localhost:5000`)
   console.log(`Try to open these routes:`)
@@ -191,7 +199,7 @@ app.listen(5000, () => {
 })
 ```
 
-### [.addResource](index.js#L241)
+### [.addResource](index.js#L249)
 > Simple method that is alias of `.addRoutes` and `.addResources`, but for adding single resource. It can accepts only one `resource` object.
 
 **Params**
@@ -215,7 +223,7 @@ api.addResource(api.createResource('dragons'))
 console.log(api.resources.length) // 1
 console.log(api.routes.length) // 7
 
-console.log(api.getResouce('dragons'))
+console.log(api.getResource('dragons'))
 // array of route objects
 // => [
 //   { prefix: '/', route: '/dragons', path: '/dragons', ... }
@@ -224,7 +232,7 @@ console.log(api.getResouce('dragons'))
 // ]
 ```
 
-### [.getResource](index.js#L279)
+### [.getResource](index.js#L287)
 > Get single resource by `name`. Special case is resource to the `/` prefix. So pass `/` as `name`. See more on what are the _"Route Objects"_ in the [koa-better-router][] docs. What that method returns, I call _"Resource Object"_ - array of _"Route Objects"_
 
 **Params**
@@ -253,7 +261,7 @@ console.log(api.getResource('frogs'))
 console.log(api.getResources().length) // 2
 ```
 
-### [.resource](index.js#L391)
+### [.resource](index.js#L399)
 > Creates a resource using `.createResource` and adds the resource routes to the `this.routes` array, using `.addResource`. This is not an alias! It is combination of two methods. Methods that are not defined in given `ctrl` (controller) returns by default `501 Not Implemented`. You can override any defaults - default request methods and default controller methods, just by passing respectively `opts.methods` object and `opts.map` object.
 
 **Params**
@@ -348,7 +356,7 @@ app.listen(4433, () => {
 })
 ```
 
-### [.addResources](index.js#L404)
+### [.addResources](index.js#L412)
 
 > Just an alias of [koa-better-router][]'s' `.addRoutes` method.
 
@@ -357,7 +365,7 @@ app.listen(4433, () => {
 * `...args` **{Array}**: any number of arguments (arrays of route objects)    
 * `returns` **{KoaRestRouter}** `this`: instance for chaining  
 
-### [.getResources](index.js#L442)
+### [.getResources](index.js#L450)
 > As we have `.getRoutes` method for getting `this.routes`, so we have `.getResources` for getting `this.resources` array, too. Each `.createResource` returns array of route objects with length of 7, so 7 routes. So if you call `.createResource` two times the `this.resources` (what this method returns) will contain 2 arrays with 7 routes in each of them.
 
 * `returns` **{Array}**: array of arrays of route objects  
@@ -384,7 +392,7 @@ console.log(router.resources.length)       // 2
 console.log(router.getResources().length)  // 2
 ```
 
-### [.groupResources](index.js#L508)
+### [.groupResources](index.js#L517)
 > Powerful method for grouping couple of resources into one resource endpoint. For example you have `/cats` and `/dogs` endpoints, but you wanna create `/cats/:cat/dogs/:dog` endpoint, so you can do such things with that. You can group infinite number of resources. Useful methods that gives you what you should pass as arguments here are `.createResource`, `.createRoute`, `.getResources`, `.getResource` and `.getRoutes`. **Note:** Be aware of that it replaces middlewares of `dest` with the middlewares of last `src`.
 
 **Params**
@@ -397,7 +405,7 @@ console.log(router.getResources().length)  // 2
 **Example**
 
 ```js
-let router = require('koa-rest-router')().loadMethods()
+let router = require('koa-rest-router')({ prefix: '/api/v3'})
 
 let departments = router.createResource('departments')
 let companies = router.createResource('companies')
@@ -426,7 +434,8 @@ router.addRoutes(one, foo)
 let Koa = require('koa')
 let app = new Koa()
 
-app.use(router.middleware({ prefix: '/api/v3' }))
+app.use(router.middleware())
+
 app.listen(4000, () => {
   console.log(`Mega API server on http://localhost:4000`)
   console.log(`Checkout these routes:`)

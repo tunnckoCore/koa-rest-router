@@ -19,8 +19,8 @@ let utils = require('./utils')
  * **Example**
  *
  * ```js
- * let router = require('koa-rest-router')
- * let api = router({ prefix: '/api/v1' })
+ * let Router = require('koa-rest-router')
+ * let api = Router({ prefix: '/api/v1' })
  *
  * // - can have multiples middlewares
  * // - can have both old and modern middlewares combined
@@ -47,17 +47,22 @@ let utils = require('./utils')
  * let Koa = require('koa') // Koa v2
  * let app = new Koa()
  *
+ * let basic = Router() // prefix is `/` by default
+ * basic.extend(api)
+ *
  * app.use(api.middleware())
- * app.use(api.middleware({ prefix: '/' }))
+ * app.use(basic.middleware())
  *
  * app.listen(4444, () => {
  *   console.log('Open http://localhost:4444 and try')
- *
  *   // will output 2x14 links
  *   // - 14 links on `/api/v1` prefix
  *   // - 14 links on `/` prefix
  *   api.routes.forEach((route) => {
- *     console.log(`${route.method} http://localhost:4444${route.route}`)
+ *     console.log(`${route.method} http://localhost:4444${route.path}`)
+ *   })
+ *   basic.routes.forEach((route) => {
+ *     console.log(`${route.method} http://localhost:4444${route.path}`)
  *   })
  * })
  * ```
@@ -93,7 +98,9 @@ util.inherits(KoaRestRouter, utils.Router)
  * **Example**
  *
  * ```js
- * let router = require('koa-rest-router')().loadMethods()
+ * let router = require('koa-rest-router')({
+ *   prefix: '/api'
+ * }).loadMethods()
  *
  * // The server part
  * let body = require('koa-better-body')
@@ -161,7 +168,8 @@ util.inherits(KoaRestRouter, utils.Router)
  * console.log(router.getRoutes()) // or router.routes
  * // => array of "Route Objects"
  *
- * app.use(router.middleware({ prefix: '/api' }))
+ * app.use(router.middleware())
+ *
  * app.listen(5000, () => {
  *   console.log(`Server listening on http://localhost:5000`)
  *   console.log(`Try to open these routes:`)
@@ -224,7 +232,7 @@ KoaRestRouter.prototype.createResource = function createResource (name, ctrl, op
  * console.log(api.resources.length) // 1
  * console.log(api.routes.length) // 7
  *
- * console.log(api.getResouce('dragons'))
+ * console.log(api.getResource('dragons'))
  * // array of route objects
  * // => [
  * //   { prefix: '/', route: '/dragons', path: '/dragons', ... }
@@ -457,7 +465,7 @@ KoaRestRouter.prototype.getResources = function getResources () {
  * **Example**
  *
  * ```js
- * let router = require('koa-rest-router')().loadMethods()
+ * let router = require('koa-rest-router')({ prefix: '/api/v3'})
  *
  * let departments = router.createResource('departments')
  * let companies = router.createResource('companies')
@@ -486,7 +494,8 @@ KoaRestRouter.prototype.getResources = function getResources () {
  * let Koa = require('koa')
  * let app = new Koa()
  *
- * app.use(router.middleware({ prefix: '/api/v3' }))
+ * app.use(router.middleware())
+ *
  * app.listen(4000, () => {
  *   console.log(`Mega API server on http://localhost:4000`)
  *   console.log(`Checkout these routes:`)
