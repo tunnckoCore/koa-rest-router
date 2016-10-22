@@ -4,11 +4,11 @@
 
 [![code climate][codeclimate-img]][codeclimate-url] [![standard code style][standard-img]][standard-url] [![travis build status][travis-img]][travis-url] [![coverage status][coveralls-img]][coveralls-url] [![dependency status][david-img]][david-url]
 
-### Attention
-
-It seems this package was created at `2015-01-22T23:09:00.237Z` and later is unpublish. So use with an attention. It is easy fix instead of publishig `0.5.0` as I thougth (_and noticed this fact that there are `0.5.0`, `0.5.2`, `0.6.0`, `0.6.3` and `0.7.0` already published versions_) **I'll just bump to `0.8.0` now**. Hopefully last before **stable v1** and will **deprecate** all previous versions! I just need to get `v1.2` of [koa-better-router][] finished tomorrow. It is pretty stable now and there no plans for something new, but wanna clean few more things and docs.
-
 ## Table of Contents
+- [Quickstart](#quickstart)
+  * [Controller methods mapping](#controller-methods-mapping)
+  * [Overriding controller methods](#overriding-controller-methods)
+  * [Overriding request methods](#overriding-request-methods)
 - [Install](#install)
 - [Usage](#usage)
 - [API](#api)
@@ -25,10 +25,145 @@ It seems this package was created at `2015-01-22T23:09:00.237Z` and later is unp
 
 **ProTip:** Checkout [koa-better-router API](https://github.com/tunnckoCore/koa-better-router#api) too to know what more methods comes with this.
 
-## Install
+## Quickstart
+> This router uses [koa-better-body][], so you should review its API documentation to get more info how the things are working and what more methods are exposed.
 
+### Controller methods mapping
+> In addition this router allows you to override the controller methods which will be used in certain route path.
+
+**Defaults**
+
+| Request method | Route path | Controller method |
+| --- | --- | --- |
+| GET | `/users` | `index` |
+| GET | `/users/new ` | `new` |
+| POST | `/users` | `create` |
+| GET | `/users/:user` | `show` |
+| GET | `/users/:user/edit` | `edit` |
+| PUT | `/users/:user` | `update` |
+| DELETE | `/users/:user` | `remove` |
+
+**Example**
+
+```js
+let Router = require('koa-rest-router')
+let router = Router()
+
+router.resource('users', {
+  // GET /users
+  index: (ctx, next) => {},
+
+  // GET /users/new
+  new: (ctx, next) => {},
+
+  // POST /users
+  create: (ctx, next) => {},
+
+  // GET /users/:user
+  show: (ctx, next) => {},
+
+  // GET /users/:user/edit
+  edit: (ctx, next) => {},
+
+  // PUT /users/:user
+  update: (ctx, next) => {},
+
+  // DELETE /users/:user
+  remove: (ctx, next) => {}
+})
+
+let users = router.getResource('users')
+
+console.log(users.length) // => 7
+console.log(users) // => Array Route Objects
+
+console.log(router.routes.length) // => 7
+console.log(router.resources.length) // => 1
 ```
-npm i koa-rest-router --save
+
+**Note:** Multiple middlewares can be passed on each. Also combining old and modern koa middlewares, so both generator functions and normal functions.
+
+### Overriding controller methods
+> You easily can override the defaults by passing `options.map` object with key/value pairs where the key represents the original, and value is a string containing the wanted override.
+
+**Example**
+
+```js
+let router = require('koa-rest-router')()
+
+let options = {
+  map: {
+    index: 'foo',
+    new: 'bar',
+    create: 'baz',
+    show: 'qux',
+  }
+}
+
+router.resource('users', {
+  // GET /users
+  foo: (ctx, next) => {},
+
+  // GET /users/new
+  bar: (ctx, next) => {},
+
+  // POST /users
+  baz: (ctx, next) => {},
+
+  // GET /users/:user
+  qux: (ctx, next) => {},
+
+  // ... etc
+}, options)
+```
+
+### Overriding request methods
+> In some cases in guides the REST routes uses different request methods and that field is not clear enough. So every sane router should allow overriding such things, so we do it. By default for updating is used `PUT`, for deleting/removing is `DELETE`. You can override this methods to use `POST` instead, so ...
+
+**Example**
+
+```js
+let router = require('koa-rest-router')()
+
+let options = {
+  methods: {
+    put: 'POST'
+  }  
+}
+
+router.resource('cats', {
+  // POST /cats/:cat
+  update: (ctx, next) => {}
+}, options)
+```
+
+And you can combine both overriding variants, of course
+
+**Example**
+
+```js
+let router = require('koa-rest-router')()
+
+let options = {
+  methods: {
+    put: 'POST'
+  },
+  map: {
+    update: 'foobar'
+  }
+}
+
+router.resource('cats', {
+  // POST /cats/:cat
+  foobar: (ctx, next) => {}
+}, options)
+```
+
+## Install
+> Install with [npm](https://www.npmjs.com/)
+
+```sh
+$ npm i koa-rest-router --save
 ```
 
 ## Usage
@@ -38,6 +173,7 @@ npm i koa-rest-router --save
 let router = require('koa-rest-router')()
 
 // or
+
 let Router = require('koa-rest-router')
 let apiRouter = Router({ prefix: '/api/v1' })
 ```
@@ -514,3 +650,4 @@ But before doing anything, please read the [CONTRIBUTING.md](./CONTRIBUTING.md) 
 [new-message-url]: https://github.com/tunnckoCore/ama
 [new-message-img]: https://img.shields.io/badge/ask%20me-anything-green.svg
 
+[koa-better-body]: https://github.com/tunnckocore/koa-better-body
