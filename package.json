@@ -116,12 +116,17 @@
     },
     "reflinks": [
       "koa",
+      "koa-better-body",
       "koa-better-router",
       "koa-send",
       "path-match",
-      "koa-better-body",
       "recipe",
-      "short-meaningful-recipe-name"
+      "short-meaningful-recipe-name",
+      "charlike",
+      "commitizen",
+      "standard-version",
+      "verb",
+      "verb-generate-readme"
     ]
   },
   "engines": {
