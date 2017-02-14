@@ -120,6 +120,18 @@ util.inherits(KoaRestRouter, utils.Router)
  *   remove: 'destroy'
  * }
  *
+ * // notice the body should be invoked explicitly
+ * // with or without options object, no matter
+ * let updateMiddlewares = [body(), (ctx, next) => {
+ *   ctx.body = `This method by default is triggered with PUT requests only.`
+ *   ctx.body = `${ctx.body} But now it is from POST request.`
+ *   return next()
+ * }, function * (next) => {
+ *   this.body = `${this.body} Incoming data is`
+ *   this.body = `${this.body} ${JSON.stringify(this.request.fields, null, 2)}`
+ *   yield next
+ * }]
+ *
  * // create actual resource
  * let cats = router.createResource('cats', {
  *   list: [
@@ -138,15 +150,7 @@ util.inherits(KoaRestRouter, utils.Router)
  *     ctx.body = `${ctx.body} By default this method is called "show".`
  *     return next()
  *   },
- *   update: [body, (ctx, next) => {
- *     ctx.body = `This method by default is triggered with PUT requests only.`
- *     ctx.body = `${ctx.body} But now it is from POST request.`
- *     return next()
- *   }, function * (next) => {
- *     this.body = `${this.body} Incoming data is`
- *     this.body = `${this.body} ${JSON.stringify(this.request.fields, null, 2)}`
- *     yield next
- *   }],
+ *   update: updateMiddlewares,
  *   destroy: (ctx, next) => {
  *     ctx.body = `This route should be called with DELETE request, by default.`
  *     ctx.body = `${ctx.body} But now it request is POST.`
