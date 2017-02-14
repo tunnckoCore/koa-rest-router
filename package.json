@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Most powerful, flexible and composable router for building enterprise RESTful APIs easily!",
   "repository": "tunnckoCore/koa-rest-router",
-  "author": "Charlike Mike Reagent <@tunnckoCore> (http://www.tunnckocore.tk)",
+  "author": "Charlike Mike Reagent <@tunnckoCore> (https://i.am.charlike.online)",
   "precommit.silent": true,
   "main": "index.js",
   "license": "MIT",
@@ -118,7 +118,10 @@
       "koa",
       "koa-better-router",
       "koa-send",
-      "path-match"
+      "path-match",
+      "koa-better-body",
+      "recipe",
+      "short-meaningful-recipe-name"
     ]
   }
 }
