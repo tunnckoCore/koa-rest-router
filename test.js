@@ -224,6 +224,36 @@ test('should group resources using `.groupResources`', function (done) {
     })
 })
 
+test('should generate correct routes using `.groupResources` for a default prefix', function () {
+  let apiRouter = new Router()
+  let companies = apiRouter.createResource('companies')
+  let profiles = apiRouter.createResource('profiles')
+
+  let resource = apiRouter.groupResources(companies, profiles)
+
+  test.strictEqual(resource[0].path, '/companies/:company/profiles')
+  test.strictEqual(resource[1].path, '/companies/:company/profiles/new')
+  test.strictEqual(resource[2].path, '/companies/:company/profiles')
+  test.strictEqual(resource[3].path, '/companies/:company/profiles/:profile')
+  test.strictEqual(resource[4].path, '/companies/:company/profiles/:profile/edit')
+  test.strictEqual(resource[5].path, '/companies/:company/profiles/:profile')
+})
+
+test('should generate correct routes using `.groupResources` for a custom prefix', function () {
+  let apiRouter = new Router({ prefix: '/api' })
+  let companies = apiRouter.createResource('companies')
+  let profiles = apiRouter.createResource('profiles')
+
+  let resource = apiRouter.groupResources(companies, profiles)
+
+  test.strictEqual(resource[0].path, '/api/companies/:company/profiles')
+  test.strictEqual(resource[1].path, '/api/companies/:company/profiles/new')
+  test.strictEqual(resource[2].path, '/api/companies/:company/profiles')
+  test.strictEqual(resource[3].path, '/api/companies/:company/profiles/:profile')
+  test.strictEqual(resource[4].path, '/api/companies/:company/profiles/:profile/edit')
+  test.strictEqual(resource[5].path, '/api/companies/:company/profiles/:profile')
+})
+
 test('should be able to re-map controller methods through opitons', function (done) {
   let options = {
     map: {

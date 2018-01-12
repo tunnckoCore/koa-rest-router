@@ -24,7 +24,10 @@ utils.updateRoute = function updateRoute (ctx, destRoute) {
   let route = destRoute.route.slice(1)
   /* istanbul ignore next */
   if (!route.length) return '/:id'
-  route = route.replace(ctx.options.prefix, '')
+
+  if (ctx.options.prefix !== '/') {
+    route = route.replace(ctx.options.prefix, '')
+  }
 
   let res = []
   let singular = null
