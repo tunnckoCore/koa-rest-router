@@ -701,14 +701,14 @@ _Project scaffolded using [charlike][] cli._
 [codeclimate-url]: https://codeclimate.com/github/tunnckoCore/koa-rest-router
 [codeclimate-img]: https://img.shields.io/codeclimate/github/tunnckoCore/koa-rest-router.svg
 
-[travis-url]: https://travis-ci.org/tunnckoCore/koa-rest-router
-[travis-img]: https://img.shields.io/travis/tunnckoCore/koa-rest-router/master.svg?label=linux
+[travis-url]: https://travis-ci.org/olstenlarck/koa-rest-router
+[travis-img]: https://img.shields.io/travis/olstenlarck/koa-rest-router/master.svg?label=linux
 
 [appveyor-url]: https://ci.appveyor.com/project/tunnckoCore/koa-rest-router
 [appveyor-img]: https://img.shields.io/appveyor/ci/tunnckoCore/koa-rest-router/master.svg?label=windows
 
-[coverage-url]: https://codecov.io/gh/tunnckoCore/koa-rest-router
-[coverage-img]: https://img.shields.io/codecov/c/github/tunnckoCore/koa-rest-router/master.svg
+[coverage-url]: https://codecov.io/gh/olstenlarck/koa-rest-router
+[coverage-img]: https://img.shields.io/codecov/c/github/olstenlarck/koa-rest-router/master.svg
 
 [david-url]: https://david-dm.org/tunnckoCore/koa-rest-router
 [david-img]: https://img.shields.io/david/tunnckoCore/koa-rest-router.svg
